@@ -1,12 +1,12 @@
-package tictactoe;
+package previous;
 
 import java.util.Scanner;
 
-public class Main {
+public class Main2 {
     private final char[] data;
     StringBuilder sb;  // contract: initialize in render(), fill, print, forget
 
-    Main(char[] data) {
+    Main2(char[] data) {
         this.data = data;
     }
 
@@ -35,7 +35,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.print("Enter cells: ");
-        Main tic = new Main(new Scanner(System.in).nextLine().toCharArray());
+        Main2 tic = new Main2(new Scanner(System.in).nextLine().toCharArray());
         tic.render();
     }
 }
