@@ -10,7 +10,8 @@
 /nbactions.xml
 
 # EduTools
-/**/production/classes/*
-/**/task/build/classes/*
-/**/task/out/*
-/**/tmp/test/*_tmp
+/**/out/production/*
+/**/build/classes/*
+/**/build/reports/*
+/**/build/test-results/*
+/**/build/tmp/*
