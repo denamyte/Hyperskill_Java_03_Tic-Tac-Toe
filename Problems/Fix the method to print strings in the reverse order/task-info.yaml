@@ -23,9 +23,6 @@ files:
         }
     }
   learner_created: false
-- name: src/Test.java
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/3117#comment
 status: Solved
 feedback:
