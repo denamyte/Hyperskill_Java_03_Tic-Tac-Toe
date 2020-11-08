@@ -1,10 +1,10 @@
-package tictactoe;
+package previous;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Main {
+public class Main3 {
     public static final int X_SUM = 264;
     public static final int O_SUM = 237;
     // Obtained
@@ -19,7 +19,7 @@ public class Main {
         put('O', 0);
     }};
 
-    Main(char[] data) {
+    Main3(char[] data) {
         this.data = data;
     }
 
@@ -84,7 +84,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.print("Enter cells: ");
-        Main tic = new Main(new Scanner(System.in).nextLine().toCharArray());
+        Main3 tic = new Main3(new Scanner(System.in).nextLine().toCharArray());
         System.out.println(tic.render());
     }
 }
