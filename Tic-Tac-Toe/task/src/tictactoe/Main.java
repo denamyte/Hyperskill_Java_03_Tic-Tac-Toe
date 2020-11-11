@@ -8,7 +8,7 @@ public class Main {
     public static final int X_SUM = 264;
     public static final int O_SUM = 237;
     // Obtained
-    private final char[] data;
+    private char[] data;
     // Derived
     private final Map<Integer, Integer> sumsMap = new HashMap<>() {{
         put(X_SUM, 0);
@@ -19,18 +19,69 @@ public class Main {
         put('O', 0);
     }};
 
-    Main(char[] data) {
-        this.data = data;
+    private GameState state = GameState.START;
+
+    public Main() {
+        manage(null);
     }
 
-    public String render() {
+    public void manage(String input) {
+        switch (state) {
+            case START:
+                turnOnState(GameState.ENTER_CELLS, "Enter cells: ");
+                break;
+            case ENTER_CELLS:
+                enterCells(input);
+                turnOnState(GameState.ENTER_CRD, "Enter the coordinates: ");
+                break;
+            case ENTER_CRD:
+                manageEnteringCoordinates(input);
+                break;
+            case DONE:
+                break;
+        }
+    }
+
+    private void turnOnState(GameState state, String msg) {
+        this.state = state;
+        if (msg != null) {
+            System.out.print(msg);
+        }
+    }
+
+    private void enterCells(String input) {
+        data = input.toCharArray();
+        System.out.println(render(false));
+    }
+
+    private void manageEnteringCoordinates(String input) {
+        if (coordinatesEntered(input)) {
+            render(false);
+//            turnOnState(
+//                    // TODO: 11/11/20 Go on herein
+//            );
+        }
+    }
+    
+    private boolean coordinatesEntered(String input) {
+        // TODO: 11/11/20
+        //  Check the pattern: /\d +\d/
+        //  Check the numbers range: [1..3]
+        //  Check if the specified cell is occupied
+
+        return false;
+    }
+
+    public String render(boolean includeGameState) {
         StringBuilder sb = new StringBuilder();
         sb.append("---------\n");
         for (int row = 0; row < 3; row++) {
             bodyLine(sb, row * 3);
         }
-        sb.append("---------\n");
-        sb.append(chooseGameState()).append('\n');
+        sb.append("---------");
+        if (includeGameState) {
+            sb.append(chooseGameState()).append('\n');
+        }
 
         return sb.toString();
     }
@@ -82,9 +133,19 @@ public class Main {
         sumsMap.compute(key, (k, value) -> value == null ? 1 : value + 1);
     }
 
+    enum GameState {
+        START,
+        ENTER_CELLS,
+        ENTER_CRD,
+
+        DONE
+    }
+
     public static void main(String[] args) {
-        System.out.print("Enter cells: ");
-        Main tic = new Main(new Scanner(System.in).nextLine().toCharArray());
-        System.out.println(tic.render());
+        Scanner scanner = new Scanner(System.in);
+        Main ticTac = new Main();
+        while (ticTac.state != GameState.DONE) {
+            ticTac.manage(scanner.nextLine());
+        }
     }
 }
