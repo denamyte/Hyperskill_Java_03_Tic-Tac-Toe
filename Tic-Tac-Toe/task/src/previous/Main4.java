@@ -1,9 +1,9 @@
-package tictactoe;
+package previous;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Main {
+public class Main4 {
 //    public static final int X_SUM = 264;
 //    public static final int O_SUM = 237;
     // Derived
@@ -20,7 +20,7 @@ public class Main {
     private char[] data;
     private GameState state = GameState.START;
 
-    public Main() {
+    public Main4() {
         manage(null);
     }
 
@@ -178,7 +178,7 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Main ticTac = new Main();
+        Main4 ticTac = new Main4();
         while (ticTac.state != GameState.DONE) {
             ticTac.manage(scanner.nextLine());
         }
