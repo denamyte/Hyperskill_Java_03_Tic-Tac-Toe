@@ -1,36 +1,32 @@
 package tictactoe;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+
+import static tictactoe.Main.GameState.*;
 
 public class Main {
     public static final int X_SUM = 264;  // 'X' + 'X' + 'X'
     public static final int O_SUM = 237;  // 'O' + 'O' + 'O'
-    public static final String ENTER = "Enter the coordinates: ";
-    public static final String ERROR_OCCUPIED = "This cell is occupied! Choose another one!\n";
-    public static final String ERROR_NOT_NUMBERS = "You should enter numbers!\n";
-    public static final String ERROR_NOT_1_3 = "Coordinates should be from 1 to 3!\n";
-    // Derived
+    public static final Map<GameState, String> infoMap = Map.of(
+            ENTER_CELLS, "Enter the coordinates: ",
+            ERROR_NOT_NUMBERS, "You should enter numbers!\n",
+            ERROR_OUT_OF_RANGE, "Coordinates should be from 1 to 3!\n",
+            ERROR_ALREADY_OCCUPIED, "This cell is occupied! Choose another one!\n",
+            X_WINS, "X wins\n",
+            O_WINS, "O wins\n",
+            DRAW, "Draw\n"
+    );
+
     private final Map<Integer, Integer> sumsMap = new HashMap<>() {{
         put(X_SUM, 0);
         put(O_SUM, 0);
     }};
-//    private final Map<Character, Integer> countsMap = new HashMap<>() {{
-//        put('X', 0);
-//        put('O', 0);
-//    }};
 
-    // Obtained
-    private char[] data;
+    private final char[] data;
     private int movesCount;
     private boolean xsTurn = true;
-    private String additionalString;  // one of three errors | draw message | win message
     private int[] crd;
-    @Deprecated
-    private GameState state = GameState.START;
-    private GameState2 state2 = GameState2.ENTER_CELLS;
+    private GameState state = ENTER_CELLS;
 
     public Main() {
         data = new char[9];
@@ -38,29 +34,29 @@ public class Main {
     }
 
     public boolean notFinished() {
-        System.out.print(render());
-        return state2 != GameState2.FINISHED;
+        return !FINISHED_SET.contains(state);
     }
 
     public void input(String input) {
+        state = ENTER_CELLS;
         parseAndCheckCrd(input);
-
-        // TODO: 11/13/20 Define state here
-
+        if (!ERROR_SET.contains(state)) {
+            setFieldByCrd(xsTurn ? 'X' : 'O', crd);
+            xsTurn = !xsTurn;
+            movesCount++;
+            checkIfGameFinished();
+        }
     }
 
     private void parseAndCheckCrd(String input) {
-        state2 = GameState2.ERROR;
         if (!input.matches("\\d +\\d")) {
-            additionalString = ERROR_NOT_NUMBERS;
+            state = ERROR_NOT_NUMBERS;
         } else if (!input.matches("[1-3] +[1-3]")) {
-            additionalString = ERROR_NOT_1_3;
+            state = ERROR_OUT_OF_RANGE;
         } else {
             crd = Arrays.stream(input.split(" +")).mapToInt(Integer::parseInt).toArray();
             if (getFieldByCrd(crd) != ' ') {
-                additionalString = ERROR_OCCUPIED;
-            } else {
-                state2 = GameState2.ENTER_CELLS;
+                state = ERROR_ALREADY_OCCUPIED;
             }
         }
     }
@@ -79,14 +75,14 @@ public class Main {
 
     public String render() {
         StringBuilder sb = new StringBuilder();
-        if (state2 != GameState2.ERROR) {
+        if (!ERROR_SET.contains(state)) {
             renderTable(sb);
         }
-        if (state2 != GameState2.ENTER_CELLS){
-            sb.append(additionalString);
+        if (state != ENTER_CELLS){
+            sb.append(infoMap.get(state));
         }
-        if (state2 != GameState2.FINISHED) {
-            sb.append(ENTER);
+        if (!FINISHED_SET.contains(state)) {
+            sb.append(infoMap.get(ENTER_CELLS));
         }
         return sb.toString();
     }
@@ -96,7 +92,7 @@ public class Main {
         for (int row = 0; row < 3; row++) {
             bodyLine(sb, row * 3);
         }
-        sb.append("---------");
+        sb.append("---------\n");
     }
 
     private void bodyLine(StringBuilder sb, int shift) {
@@ -107,30 +103,16 @@ public class Main {
         sb.append("|\n");
     }
 
-    private String chooseGameState() {
-//        countXO();
+    private void checkIfGameFinished() {
         countSums();
-//        if (Math.abs(countsMap.get('X') - countsMap.get('O')) >= 2
-//                || sumsMap.get(X_SUM) + sumsMap.get(O_SUM) > 1) {
-//            return "Impossible";
-//        }
         if (sumsMap.get(X_SUM) == 1) {
-            return "X wins";
+            state = X_WINS;
+        } else if (sumsMap.get(O_SUM) == 1) {
+            state = O_WINS;
+        } else if (movesCount == 9) {
+            state = DRAW;
         }
-        if (sumsMap.get(O_SUM) == 1) {
-            return "O wins";
-        }
-        if (movesCount == 9) {
-            return "Draw";
-        }
-        return "Game not finished";
     }
-
-//    private void countXO() {
-//        for (char field : data) {
-//            countsMap.compute(field, (k, v) -> v == null ? 1 : v + 1);
-//        }
-//    }
 
     /** Counts sums of char indices in diagonals, rows and columns */
     private void countSums() {
@@ -147,24 +129,21 @@ public class Main {
     }
 
     enum GameState {
-        START,
-        ENTER_CELLS,
-        ENTER_CRD,
-
-        DONE
-    }
-
-    enum GameState2 {
-        ENTER_CELLS,
-        ERROR,
-        FINISHED
+        ENTER_CELLS, ERROR_NOT_NUMBERS, ERROR_OUT_OF_RANGE, ERROR_ALREADY_OCCUPIED, X_WINS, O_WINS, DRAW;
+        static EnumSet<GameState> FINISHED_SET = EnumSet.of(X_WINS, O_WINS, DRAW);
+        static EnumSet<GameState> ERROR_SET = EnumSet.of(ERROR_NOT_NUMBERS, ERROR_OUT_OF_RANGE, ERROR_ALREADY_OCCUPIED);
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Main ticTac = new Main();
-        while (ticTac.notFinished()) {
-            ticTac.input(scanner.nextLine());
+        while (true) {
+            System.out.print(ticTac.render());
+            if (ticTac.notFinished()) {
+                ticTac.input(scanner.nextLine());
+            } else {
+                break;
+            }
         }
     }
 }
