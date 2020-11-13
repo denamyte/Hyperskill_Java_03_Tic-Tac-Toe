@@ -1,16 +1,18 @@
 package tictactoe;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-//    public static final int X_SUM = 264;
-//    public static final int O_SUM = 237;
+    public static final int X_SUM = 264;
+    public static final int O_SUM = 237;
     // Derived
-//    private final Map<Integer, Integer> sumsMap = new HashMap<>() {{
-//        put(X_SUM, 0);
-//        put(O_SUM, 0);
-//    }};
+    private final Map<Integer, Integer> sumsMap = new HashMap<>() {{
+        put(X_SUM, 0);
+        put(O_SUM, 0);
+    }};
 //    private final Map<Character, Integer> countsMap = new HashMap<>() {{
 //        put('X', 0);
 //        put('O', 0);
@@ -18,13 +20,20 @@ public class Main {
 
     // Obtained
     private char[] data;
+    private int movesCount;
+    private int errorString;
+    @Deprecated
     private GameState state = GameState.START;
+    private GameState2 state2 = GameState2.ENTER_CELLS;
 
     public Main() {
-        manage(null);
+        data = new char[9];
+        Arrays.fill(data, '_');
     }
 
     public void manage(String input) {
+        render(true);
+
         switch (state) {
             case START:
                 turnOnState(GameState.ENTER_CELLS, "Enter cells: ");
@@ -39,6 +48,7 @@ public class Main {
         }
     }
 
+    @Deprecated
     private void turnOnEnterCrd() {
         turnOnState(GameState.ENTER_CRD, "Enter the coordinates: ");
     }
@@ -64,7 +74,7 @@ public class Main {
             turnOnEnterCrd();
         }
     }
-    
+
     private int[] parseAndCheckCrd(String input) {
         if (!input.matches("\\d +\\d")) {
             System.out.println("You should enter numbers!");
@@ -107,12 +117,14 @@ public class Main {
     }
 
     public String render(boolean includeGameState) {
+        // TODO: 11/13/20 render should include errors
         StringBuilder sb = new StringBuilder();
         sb.append("---------\n");
         for (int row = 0; row < 3; row++) {
             bodyLine(sb, row * 3);
         }
         sb.append("---------");
+
         if (includeGameState) {
             sb.append(chooseGameState()).append('\n');
         }
@@ -129,23 +141,22 @@ public class Main {
     }
 
     private String chooseGameState() {
-        return "";
 //        countXO();
-//        countSums();
+        countSums();
 //        if (Math.abs(countsMap.get('X') - countsMap.get('O')) >= 2
 //                || sumsMap.get(X_SUM) + sumsMap.get(O_SUM) > 1) {
 //            return "Impossible";
 //        }
-//        if (sumsMap.get(X_SUM) == 1) {
-//            return "X wins";
-//        }
-//        if (sumsMap.get(O_SUM) == 1) {
-//            return "O wins";
-//        }
-//        if (countsMap.get('X') + countsMap.get('O') == 9) {
-//            return "Draw";
-//        }
-//        return "Game not finished";
+        if (sumsMap.get(X_SUM) == 1) {
+            return "X wins";
+        }
+        if (sumsMap.get(O_SUM) == 1) {
+            return "O wins";
+        }
+        if (movesCount == 9) {
+            return "Draw";
+        }
+        return "Game not finished";
     }
 
 //    private void countXO() {
@@ -154,19 +165,19 @@ public class Main {
 //        }
 //    }
 
-//    /** Counts sums of char indices in diagonals, rows and columns */
-//    private void countSums() {
-//        incSumsMap(data[0] + data[4] + data[8]);  // main diagonal
-//        incSumsMap(data[2] + data[4] + data[6]);  // secondary diagonal
-//        for (int i = 0; i < 3; i++) {
-//            incSumsMap(data[i * 3] + data[i * 3 + 1] + data[i * 3 + 2]);  // rows
-//            incSumsMap(data[i] + data[3 + i] + data[6 + i]);  // columns
-//        }
-//    }
+    /** Counts sums of char indices in diagonals, rows and columns */
+    private void countSums() {
+        incSumsMap(data[0] + data[4] + data[8]);  // main diagonal
+        incSumsMap(data[2] + data[4] + data[6]);  // secondary diagonal
+        for (int i = 0; i < 3; i++) {
+            incSumsMap(data[i * 3] + data[i * 3 + 1] + data[i * 3 + 2]);  // rows
+            incSumsMap(data[i] + data[3 + i] + data[6 + i]);  // columns
+        }
+    }
 
-//    private void incSumsMap(int key) {
-//        sumsMap.compute(key, (k, value) -> value == null ? 1 : value + 1);
-//    }
+    private void incSumsMap(int key) {
+        sumsMap.compute(key, (k, value) -> value == null ? 1 : value + 1);
+    }
 
     enum GameState {
         START,
@@ -174,6 +185,11 @@ public class Main {
         ENTER_CRD,
 
         DONE
+    }
+
+    enum GameState2 {
+        ENTER_CELLS,
+        ERROR
     }
 
     public static void main(String[] args) {
