@@ -19,7 +19,7 @@ stages:
   is_completed: true
 - id: 259
   step: 5401
-  is_completed: false
+  is_completed: true
 topics:
   0:
   - title: Introduction to Java
